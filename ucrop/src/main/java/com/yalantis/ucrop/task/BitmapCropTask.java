@@ -2,6 +2,8 @@ package com.yalantis.ucrop.task;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.net.Uri;
@@ -149,7 +151,11 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
 
         if (shouldCrop) {
             ExifInterface originalExif = new ExifInterface(mImageInputPath);
-            saveImage(Bitmap.createBitmap(mViewBitmap, cropOffsetX, cropOffsetY, mCroppedImageWidth, mCroppedImageHeight));
+            Bitmap resultBmp = Bitmap.createBitmap(mCroppedImageWidth, mCroppedImageHeight, Bitmap.Config.ARGB_8888);
+            resultBmp.eraseColor(Color.WHITE);
+            //  draw source bitmap into resulting image at given position:
+            new Canvas(resultBmp).drawBitmap(mViewBitmap, -cropOffsetX, -cropOffsetY, null);
+            saveImage(resultBmp);
             if (mCompressFormat.equals(Bitmap.CompressFormat.JPEG)) {
                 ImageHeaderParser.copyExif(originalExif, mCroppedImageWidth, mCroppedImageHeight, mImageOutputPath);
             }
